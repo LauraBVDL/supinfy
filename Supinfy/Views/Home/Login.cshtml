@@ -1,0 +1,236 @@
+﻿@{
+    Layout = null;
+}
+
+<!--Supinfy.Models.User-->
+@model Tuple<Supinfy.Models.User, Supinfy.Models.PlaylistModel, Supinfy.Models.SoundModel>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+    <link rel="stylesheet" href="~/Content/playsound.css" type="text/css" />
+    <script type="text/javascript" language="javascript">
+        listOfSongs = new Array();
+
+        function showMenu(ev) {
+            menu = document.getElementById("menu");
+            menu.style.visibility = "visible";
+            evt = ev || window.event;
+            source = evt.target || evt.srcElement;
+            fieldset = document.getElementsByTagName("fieldset");
+            for (i = 0; i < fieldset.length; i++) if (fieldset[i] == source) break;
+            if (i == 0) {
+                //RECUPERER L'USER ID ASSOCIE A LA PLAYLIST
+                menu.innerHTML = '<li>Delete</li>';
+                menu.innerHTML += '<li>Edit</li>';
+                menu.innerHTML += '<li>Featuring</li>';
+            }
+            else if (i == 1) menu.innerHTML = '<li>Delete</li>';
+            else if (i == 2) {
+                menu.innerHTML = '<li>Delete</li>';
+                menu.innerHTML += '<li>Upgrade</li>';
+                menu.innerHTML += '<li>Update</li>';
+            }
+            x = Math.min(screen.width - 60, evt.x);
+            y = Math.min(screen.height - 80, evt.y);
+            menu.style.left = x + "px";
+            menu.style.top = y + "px";
+        }
+
+        function uploading() {
+            document.getElementById("uploading").style.display = "inline-block";
+        }
+
+        function submitting() {
+            document.parcourir.filename.value = document.parcourir.fileToUpload.value;
+        }
+
+        function selection(ev) {
+            list = ev.parentNode.getElementsByTagName("div");
+            for (i = 0; i < list.length; i++) list[i].style.fontWeight = "normal";
+            ev.style.fontWeight = "bold";
+            ch = ev.lastChild.value.replace("\\", "/");
+            fname = "https://supinfy.blob.core.windows.net/test-blob-container/" + ch;
+            audio = document.getElementsByTagName("audio")[1];
+            source = audio.getElementsByTagName("source")[0];
+            source.src = fname;
+            audio.currentSrc = fname;
+            audio.onplay = function () {
+                xml = new XMLHttpRequest();
+                if (xml != null) {
+                    requete = "playtime=" + ev.firstChild.textContent;
+                    xml.onreadystatechange = function () {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                alert("enregistre");
+                            }
+                        }
+                    };
+                    xml.open("POST", "/Home/Increase", true);
+                    xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    xml.send(requete);
+                }
+            };
+            audio.load();
+        }
+
+        function plselect(d) {
+            list = d.parentNode.getElementsByTagName("div");
+            for (i = 0; i < list.length; i++) list[i].style.fontWeight = "normal";
+            d.style.fontWeight = "bold";
+            requete = "playlist=" + d.textContent;
+            xml = new XMLHttpRequest();
+            if (xml != null) {
+                xml.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        if (this.status == 200) {
+                            if (this.responseText == "ERROR") alert("ERROR");
+                            else {
+                                listOfSongs = this.responseText.split(",");
+                                ch = listOfSongs[0].replace("\\", "/");
+                                fname = "https://supinfy.blob.core.windows.net/test-blob-container/" + ch;
+                                audio = document.getElementsByTagName("audio")[0];
+                                source = audio.getElementsByTagName("source")[0];
+                                source.src = fname;
+                                audio.currentSrc = fname;
+                                currentSong = 0;
+                                audio.onended = function () {
+                                    currentSong++;
+                                    if (currentSong < listOfSongs.length) {
+                                        ch = listOfSongs[currentSong].replace("\\", "/");
+                                        fname = "https://supinfy.blob.core.windows.net/test-blob-container/" + ch;
+                                        audio = document.getElementsByTagName("audio")[0];
+                                        source = audio.getElementsByTagName("source")[0];
+                                        source.src = fname;
+                                        audio.currentSrc = fname;
+                                        audio.load();
+                                        audio.play();
+                                    }
+                                };
+                            }
+                        }
+                    }
+                };
+                xml.open("POST", "/Home/GetSounds", false);
+                xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xml.send(requete);
+            }
+        }
+
+        function createList() {
+            plname = document.getElementById("plname");
+            xml = new XMLHttpRequest();
+            if (xml != null) {
+                requete = "playlist=" + plname.getElementsByTagName("input")[0].value + "&user=" + document.getElementById("idInfo").value;
+                xml.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        if (this.status == 200) {
+                            if (this.responseText != "ERROR") {
+                                pl = document.getElementById("playlist").getElementsByClassName("contenu")[0];
+                                pl.innerHTML += this.responseText;
+                                plname.style.visibility = "hidden";
+                            }
+                        }
+                    }
+                };
+                xml.open("POST", "/Home/CreateList", true);
+                xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xml.send(requete);
+            }
+        }
+
+        function playname() {
+            document.getElementById("plname").style.visibility = "visible";
+        }
+
+        function addSound() {
+            table = new Array(0, 0);
+            n = 0;
+            lists = document.getElementsByClassName("contenu");
+            for (i = 0; i < 2; i++) {
+                list = lists[i].getElementsByTagName("div");
+                for (j = 0; j < list.length; j++) if (list[j].style.fontWeight == "bold") break;
+                if (j < list.length) table[n++] = list[j].textContent;
+            }
+            if (n == 2) {
+                requete = "add=" + table[1] + "&to=" + table[0];
+                xml = new XMLHttpRequest();
+                if (xml != null) {
+                    xml.onreadystatechange = function () {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                if (this.responseText != "OK") alert("ERROR");
+                                else alert("This sound has been successfully added");
+                            }
+                        }
+                    };
+                    xml.open("POST", "/Home/AddToList", true);
+                    xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    xml.send(requete);
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="userInfos">
+        Welcome @Model.Item1.username
+        <input type="hidden" id="idInfo" value="@Model.Item1.id" />
+    </div>
+    <fieldset id="playlist" oncontextmenu="showMenu(this);">
+        <div>
+            <input type="button" value="Add a new playlist" name="newPlaylist" onclick="playname();"/>
+            <select name="dspmode">
+                <option value="0">My playlists</option>
+                <option value="1">All playlists</option>
+                <option value="2" selected>Featured playlists</option>
+            </select>
+            <span id="plname">
+                <input type="text" name="playlistName" required/>
+                <input type="button" name="create" value="create" onclick="createList();"/>
+            </span>
+        </div>
+        <legend>Featured playlists</legend>
+        <div class="contenu">
+            @for (Supinfy.Models.PlaylistModel pl = Model.Item2; pl != null; pl = pl.next)
+            {
+                <div onclick="plselect(this);">@pl.playlistName <input type="hidden" value="@pl.userId"/></div>
+            }
+        </div>
+        <audio controls>
+            <source src="https://supinfy.blob.core.windows.net/test-blob-container//mic_muted.wav" type="audio/wav" />
+        </audio>
+        <input type="button" name="addsound" value="Add the selected sound to the selected list" onclick="addSound();"/>
+    </fieldset>
+    <fieldset id="sounds" oncontextmenu="showMenu(this);">
+        <div>
+            <input type="button" value="Upload a new sound" name="newSound" onclick="uploading();" />
+            <div id="uploading">
+                <form name="parcourir" method="post" enctype="multipart/form-data" onsubmit="submitting();" action="/Home/Uploading">
+                    <input type="file" name="fileToUpload" accept="audio/wav, audio/mp3"/>
+                    <input type="text" name="title" required/>
+                    <input type="submit" value="Upload" name="upload"/>
+                </form>
+            </div>
+        </div>
+        <legend>Sounds</legend>
+        <div class="contenu">
+            @for (Supinfy.Models.SoundModel sound = Model.Item3; sound != null; sound = sound.next)
+            {
+                <div onclick="selection(this);">@sound.title<input type="hidden" name="fname" value="@sound.filename"/></div>
+            }
+        </div>
+        <audio controls preload="none">
+            <source src="https://supinfy.blob.core.windows.net/test-blob-container//mic_muted.wav" type="audio/wav" />
+        </audio>
+    </fieldset>
+    @if (Model.Item1.role == 1)
+    {
+        <fieldset oncontextmenu="showMenu(this);"><legend>Users</legend><div id="users"></div></fieldset>
+    }
+    <ul id="menu" onmouseleave="this.style.visibility = 'hidden';" onmousedown="this.style.visibility = 'visible'"></ul>
+</body>
+</html>

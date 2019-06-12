@@ -1,0 +1,42 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Connection</title>
+    <link rel="stylesheet" href="Content/connection.css" type="text/css"/>
+    <script type="text/javascript" language="javascript">
+        function selectMode(a) {
+            fs = document.getElementsByTagName("fieldset");
+            for (i = 0; i < fs.length; i++) fs[i].style.display = (i == a) ? "block" : "none";
+        }
+        function redirect(str) {
+            document.log.action = str;
+            document.log.submit();
+        }
+    </script>
+</head>
+<body>
+    <nav><span onclick="selectMode(1);">Login</span> - <span onclick="selectMode(0);">Register</span></nav>
+    <form method="post" name="log">
+        <fieldset id="register"><legend>Register</legend>
+            <label>Username : </label><input type="text" name="regUsername" required/><br />
+            <label>First name : </label><input type="text" name="regFirstname" required/><br />
+            <label>Last name : </label><input type="text" name="regName" required/><br />
+            <label>Email :</label><input type="text" name="regMail" required/><br />
+            <label>Password : </label><input type="password" name="regPassword" required/><br />
+            <input type="button" name="register" value="Register" onclick="redirect('/Home/Register');"/>
+        </fieldset>
+        <fieldset id="login">
+            <legend>Login</legend>
+            <label>Username : </label><input type="text" name="logUsername" required/><br />
+            <label>Password : </label><input type="password" name="logPassword" required/><br />
+            <input type="button" name="login" value="Login" onclick="redirect('/Home/Login');"/>
+        </fieldset>
+    </form>
+</body>
+</html>

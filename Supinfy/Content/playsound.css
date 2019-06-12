@@ -1,0 +1,83 @@
+﻿body {
+    background-color: #E8E8E8;
+}
+
+#users, #sounds, #playlist {
+    width: 40%;
+    position: absolute;
+}
+
+#playlist, #sounds {
+    top: 8%;
+    height: 25em;
+}
+
+#playlist {
+    left: 5%;
+}
+
+#sounds {
+    left: 55%;
+}
+
+#users {
+    top: 50%;
+}
+
+fieldset {
+    border: none;
+}
+
+.contenu {
+    overflow-y: scroll;
+    width: 100%;
+    height: 20em;
+    border: 4px solid black;
+    background-color: #DCDCDC;
+}
+
+fieldset, div {
+    z-index: 8;
+}
+
+legend {
+    font-weight: bold;
+    font-size: 2em;
+    font-variant: small-caps;
+}
+
+#menu{
+    z-index: 9;
+    width: 60px;
+    height: 80px;
+    background-color: cyan;
+    visibility: hidden;
+}
+
+#uploading {
+    z-index: 9;
+    display: none;
+}
+
+#plname {
+    visibility: hidden;
+}
+
+audio {
+    width: 101%;
+}
+
+.contenu div {
+    text-align: center;
+}
+
+.contenu div {
+    cursor: pointer;
+}
+
+#playlist input[name=addsound] {
+    margin: auto;
+    display: block;
+    margin-top: 0.5em;
+    border: 1px solid black;
+}

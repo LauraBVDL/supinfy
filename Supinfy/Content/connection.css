@@ -1,0 +1,43 @@
+﻿body {
+    background-color: #E8E8E8;
+}
+
+nav {
+    text-align: center;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 0.4em;
+    padding-bottom: 0.4em;
+    background-color: gray;
+}
+
+nav span:hover {
+   cursor: pointer; 
+}
+
+#login, #register {
+    display: none;
+}
+
+label {
+    display: inline-block;
+    width: 10em;
+}
+
+fieldset {
+    margin: auto;
+    display: block;
+    width: 20%;
+    border: 1px solid black;
+    margin-top: 3em;
+    background-color: #DCDCDC;
+}
+
+fieldset legend {
+    margin:auto;
+    font-weight: bold;
+    font-variant: small-caps;
+    letter-spacing: 0.1em;
+}
